@@ -85,32 +85,6 @@ public class ProductController {
         return ResponseEntity.ok(ProductMapper.toResponse(product));
     }
 
-    @PatchMapping("/price")
-    @Operation(summary = "Update product price", description = "Updates product price and returns updated information")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Price successfully updated",
-                    content = @Content(schema = @Schema(implementation = ProductResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Invalid price or product ID"),
-            @ApiResponse(responseCode = "403", description = "No permission to update"),
-            @ApiResponse(responseCode = "404", description = "Product not found")
-    })
-    public ResponseEntity<ProductResponse> updatePrice(
-            @Parameter(description = "Product ID", required = true)
-            @RequestParam UUID id,
-
-            @Parameter(description = "New price", example = "27999.99", required = true)
-            @RequestParam double price) {
-
-        log.info("REST request to update price for product {}: {}", id, price);
-
-        // Temporary solution - will be replaced with AuthPort
-        UUID mockEditorId = UUID.randomUUID();
-
-        Product product = productService.updateProductPrice(id, price, mockEditorId);
-
-        return ResponseEntity.ok(ProductMapper.toResponse(product));
-    }
-
     @PutMapping
     @Operation(summary = "Update product details", description = "Updates product information and returns updated data")
     @ApiResponses(value = {
@@ -142,7 +116,8 @@ public class ProductController {
                 request.getKeywords(),
                 request.getDiscount(),
                 request.getCategoryId(),
-                mockEditorId
+                mockEditorId,
+                request.getPrice()
         );
 
         return ResponseEntity.ok(ProductMapper.toResponse(product));

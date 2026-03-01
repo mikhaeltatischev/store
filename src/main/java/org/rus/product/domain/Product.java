@@ -103,23 +103,11 @@ public class Product {
     }
 
     /**
-     * Update product price
-     */
-    public void updatePrice(Money newPrice, UUID editorId) {
-        if (checkCreator(editorId)) {
-            log.warn("User with id: {} trying to update cost for product with id: {}, but he is not creator", editorId, id);
-            throw new SecurityException("Only creator can update price");
-        }
-        this.price = newPrice;
-        this.lastModifiedAt = LocalDateTime.now();
-    }
-
-    /**
      * Update product details
      * */
     public void updateDetails(String name, String brand, String shortDescription,
                               String description, String keywords, Double discount,
-                              UUID categoryId, UUID editorId) {
+                              UUID categoryId, UUID editorId, Double price) {
         log.info("Updating details for product {} by user {}", id, editorId);
 
         if (checkCreator(editorId)) {
@@ -128,6 +116,7 @@ public class Product {
             throw new SecurityException("Only creator can update product details");
         }
 
+        this.price = price != null ? Money.rub(price) : this.price;
         this.name = name != null ? name : this.name;
         this.brand = brand != null ? brand : this.brand;
         this.shortDescription = shortDescription != null ? shortDescription : this.shortDescription;

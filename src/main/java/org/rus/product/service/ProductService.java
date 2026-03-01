@@ -84,35 +84,18 @@ public class ProductService {
     }
 
     /**
-     * Update product price
-     */
-    public Product updateProductPrice(UUID productId, double newPrice, UUID editorId) {
-        log.trace("Updating price for product {}: new price={}, editor={}",
-                productId, newPrice, editorId);
-
-        Product product = getProduct(productId);
-
-        product.updatePrice(Money.rub(newPrice), editorId);
-
-        Product updated = productRepository.save(product);
-
-        log.trace("Product price updated successfully: {}", productId);
-        return updated;
-    }
-
-    /**
      * Update product details
      */
     public Product updateProductDetails(UUID productId, String name, String brand,
                                         String shortDescription, String description,
                                         String keywords, Double discount,
-                                        UUID categoryId, UUID editorId) {
+                                        UUID categoryId, UUID editorId, Double price) {
         log.trace("Updating details for product {} by editor {}", productId, editorId);
 
         Product product = getProduct(productId);
 
         product.updateDetails(name, brand, shortDescription, description,
-                keywords, discount, categoryId, editorId);
+                keywords, discount, categoryId, editorId, price);
 
         Product updated = productRepository.save(product);
 

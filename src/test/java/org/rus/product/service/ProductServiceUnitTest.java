@@ -164,44 +164,6 @@ class ProductServiceUnitTest {
     }
 
     @Nested
-    @DisplayName("Update Product Price Tests")
-    class UpdateProductPriceTests {
-
-        @Test
-        @DisplayName("Should update product price successfully")
-        void shouldUpdateProductPriceSuccessfully() {
-            // Given
-            double newPrice = 1500.0;
-            when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
-            when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
-
-            // When
-            Product result = productService.updateProductPrice(productId, newPrice, creatorId);
-
-            // Then
-            assertThat(result.getPrice().getAmount())
-                    .isEqualByComparingTo(BigDecimal.valueOf(newPrice));
-
-            verify(productRepository).findById(productId);
-            verify(productRepository).save(any(Product.class));
-        }
-
-        @Test
-        @DisplayName("Should throw exception when updating price of non-existent product")
-        void shouldThrowExceptionWhenProductNotFound() {
-            // Given
-            when(productRepository.findById(productId)).thenReturn(Optional.empty());
-
-            // When/Then
-            assertThatThrownBy(() -> productService.updateProductPrice(productId, 1500.0, editorId))
-                    .isInstanceOf(IllegalArgumentException.class);
-
-            verify(productRepository).findById(productId);
-            verify(productRepository, never()).save(any());
-        }
-    }
-
-    @Nested
     @DisplayName("Update Product Details Tests")
     class UpdateProductDetailsTests {
 
@@ -214,6 +176,7 @@ class ProductServiceUnitTest {
             String newShortDesc = "Updated Short Desc";
             String newDesc = "Updated Desc";
             String newKeywords = "updated,keywords";
+            Double price = 270.0;
             Double newDiscount = 15.0;
             UUID newCategoryId = UUID.randomUUID();
 
@@ -223,7 +186,7 @@ class ProductServiceUnitTest {
             // When
             Product result = productService.updateProductDetails(
                     productId, newName, newBrand, newShortDesc, newDesc,
-                    newKeywords, newDiscount, newCategoryId, creatorId
+                    newKeywords, newDiscount, newCategoryId, creatorId, price
             );
 
             // Then
@@ -234,6 +197,7 @@ class ProductServiceUnitTest {
             assertThat(result.getKeywords()).isEqualTo(newKeywords);
             assertThat(result.getDiscount()).isEqualTo(newDiscount);
             assertThat(result.getCategoryId()).isEqualTo(newCategoryId);
+            assertThat(result.getPrice()).isEqualTo(price);
 
             verify(productRepository).findById(productId);
             verify(productRepository).save(any(Product.class));
@@ -249,7 +213,7 @@ class ProductServiceUnitTest {
             // When
             Product result = productService.updateProductDetails(
                     productId, null, null, null, null,
-                    null, null, null, creatorId
+                    null, null, null, creatorId, null
             );
 
             // Then
