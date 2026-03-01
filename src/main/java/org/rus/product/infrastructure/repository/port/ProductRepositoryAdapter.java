@@ -1,6 +1,5 @@
 package org.rus.product.infrastructure.repository.port;
 
-import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.rus.product.domain.Product;
 import org.rus.product.dto.PageRequest;
@@ -19,7 +18,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Repository
-@Transactional
 @Slf4j
 public class ProductRepositoryAdapter implements ProductRepository {
 

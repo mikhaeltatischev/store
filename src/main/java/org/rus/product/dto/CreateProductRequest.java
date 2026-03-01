@@ -27,11 +27,11 @@ public class CreateProductRequest {
     @Schema(description = "Product brand", example = "Samsung")
     private String brand;
 
-    @Schema(description = "Short description", example = "Smartphone with a great charger")
+    @Schema(description = "Short description", example = "Smartphone with a great charger", requiredMode = Schema.RequiredMode.REQUIRED)
     @Size(max = 500, message = "Short description cannot exceed 500 characters")
     private String shortDescription;
 
-    @Schema(description = "Full description", example = "Detailed description of characteristics and functions...")
+    @Schema(description = "Full description", example = "Detailed description of characteristics and functions...", requiredMode = Schema.RequiredMode.REQUIRED)
     @Size(max = 2000, message = "Full description cannot exceed 2000 characters")
     private String description;
 
@@ -44,7 +44,7 @@ public class CreateProductRequest {
     @DecimalMax(value = "9999999.99", message = "Price cannot be greater than 9 999 999.99")
     private Double price;
 
-    @Schema(description = "Quantity in stock", example = "10")
+    @Schema(description = "Quantity in stock", example = "10", requiredMode = Schema.RequiredMode.REQUIRED)
     @Min(value = 0, message = "The quantity cannot be negative")
     @Max(value = 999999, message = "The quantity cannot exceed 999,999")
     private Integer count;

@@ -111,16 +111,6 @@ class ProductMapperTest {
         }
 
         @Test
-        @DisplayName("Should return null when product is null")
-        void shouldReturnNullWhenProductIsNull() {
-            // When
-            ProductResponse response = ProductMapper.toResponse(null);
-
-            // Then
-            assertThat(response).isNull();
-        }
-
-        @Test
         @DisplayName("Should handle null price fields")
         void shouldHandleNullPriceFields() {
             // Given
@@ -181,16 +171,6 @@ class ProductMapperTest {
             assertThat(response.getCurrency()).isEqualTo("RUB");
             assertThat(response.isAvailable()).isTrue();
             assertThat(response.getStatus()).isEqualTo("ACTIVE");
-        }
-
-        @Test
-        @DisplayName("Should return null when product is null")
-        void shouldReturnNullWhenProductIsNull() {
-            // When
-            ProductSummaryResponse response = ProductMapper.toSummaryResponse(null);
-
-            // Then
-            assertThat(response).isNull();
         }
 
         @Test

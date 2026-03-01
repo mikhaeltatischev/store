@@ -5,10 +5,13 @@ import org.rus.product.domain.Money;
 import org.rus.product.domain.Product;
 import org.rus.product.dto.PageRequest;
 import org.rus.product.dto.PageResponse;
+import org.rus.product.enums.Status;
+import org.rus.product.exception.ProductNotFoundException;
 import org.rus.product.infrastructure.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
@@ -40,15 +43,16 @@ public class ProductService {
 
         // Create domain model
         Product product = Product.builder()
-                .id(UUID.randomUUID())
                 .name(name)
+                .status(Status.CREATED)
+                .createdAt(LocalDateTime.now())
                 .brand(brand)
                 .shortDescription(shortDescription)
                 .description(description)
                 .keywords(keywords)
                 .price(Money.rub(price))
                 .count(count)
-                .discount(discount)
+                .discount(discount == null ? 0.0 : discount)
                 .categoryId(categoryId)
                 .creatorId(creatorId)
                 .build();
@@ -72,7 +76,7 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> {
                     log.warn("Product not found: {}", productId);
-                    return new IllegalArgumentException("Product not found with id: " + productId);
+                    return new ProductNotFoundException(productId);
                 });
 
         log.trace("Product found: {} ({})", product.getName(), productId);

@@ -1,4 +1,4 @@
-# application-prod.yml
+# application-prod.yml -Dspring.profiles.active=prod
 spring:
   application:
     name: Product Service

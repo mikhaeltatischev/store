@@ -76,7 +76,7 @@ public class ProductController {
     })
     public ResponseEntity<ProductResponse> getProduct(
             @Parameter(description = "Product ID", example = "123e4567-e89b-12d3-a456-426614174000", required = true)
-            @RequestParam UUID id) {
+            @RequestParam(name = "id") UUID id) {
 
         log.info("REST request to get product by id: {}", id);
 
@@ -239,13 +239,13 @@ public class ProductController {
     })
     public ResponseEntity<PageResponse<ProductSummaryResponse>> getProductsByCategory(
             @Parameter(description = "Category ID", required = true)
-            @RequestParam UUID categoryId,
+            @RequestParam(name = "categoryId") UUID categoryId,
 
             @Parameter(description = "Page number (0-based)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "0", name = "page") int page,
 
             @Parameter(description = "Page size", example = "20")
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20", name = "size") int size) {
 
         log.info("REST request to get products by category: {}, page: {}, size: {}",
                 categoryId, page, size);
