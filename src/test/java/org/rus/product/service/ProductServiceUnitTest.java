@@ -286,33 +286,6 @@ class ProductServiceUnitTest {
     class QueryMethodsTests {
 
         @Test
-        @DisplayName("Should get products by creator")
-        void shouldGetProductsByCreator() {
-            // Given
-            PageResponse<Product> response = PageResponse.<Product>builder()
-                    .content(List.of(testProduct))
-                    .page(0)
-                    .size(10)
-                    .totalElements(100L)
-                    .totalPages(10)
-                    .first(true)
-                    .last(false)
-                    .empty(false)
-                    .build();
-
-            when(productRepository.findByCreatorId(creatorId, pageRequest))
-                    .thenReturn(response);
-
-            // When
-            PageResponse<Product> result = productService.getProductsByCreator(creatorId, pageRequest);
-
-            // Then
-            assertThat(result).isEqualTo(response);
-            assertThat(result.getContent()).hasSize(1);
-            verify(productRepository).findByCreatorId(creatorId, pageRequest);
-        }
-
-        @Test
         @DisplayName("Should get available products")
         void shouldGetAvailableProducts() {
             // Given
@@ -336,59 +309,6 @@ class ProductServiceUnitTest {
             // Then
             assertThat(result).isEqualTo(response);
             verify(productRepository).findAvailableProducts(pageRequest);
-        }
-
-        @Test
-        @DisplayName("Should get products by category")
-        void shouldGetProductsByCategory() {
-            // Given
-            PageResponse<Product> response = PageResponse.<Product>builder()
-                    .content(List.of(testProduct))
-                    .page(0)
-                    .size(10)
-                    .totalElements(100L)
-                    .totalPages(10)
-                    .first(true)
-                    .last(false)
-                    .empty(false)
-                    .build();
-
-            when(productRepository.findByCategoryId(categoryId, pageRequest))
-                    .thenReturn(response);
-
-            // When
-            PageResponse<Product> result = productService.getProductsByCategory(categoryId, pageRequest);
-
-            // Then
-            assertThat(result).isEqualTo(response);
-            verify(productRepository).findByCategoryId(categoryId, pageRequest);
-        }
-
-        @Test
-        @DisplayName("Should return empty page when no products found")
-        void shouldReturnEmptyPageWhenNoProductsFound() {
-            // Given
-            PageResponse<Product> response = PageResponse.<Product>builder()
-                    .content(List.of())
-                    .page(0)
-                    .size(10)
-                    .totalElements(0L)
-                    .totalPages(10)
-                    .first(true)
-                    .last(false)
-                    .empty(false)
-                    .build();
-
-            when(productRepository.findByCreatorId(creatorId, pageRequest))
-                    .thenReturn(response);
-
-            // When
-            PageResponse<Product> result = productService.getProductsByCreator(creatorId, pageRequest);
-
-            // Then
-            assertThat(result.getContent()).isEmpty();
-            assertThat(result.getTotalElements()).isZero();
-            verify(productRepository).findByCreatorId(creatorId, pageRequest);
         }
     }
 

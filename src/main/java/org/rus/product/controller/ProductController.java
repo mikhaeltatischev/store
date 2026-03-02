@@ -134,10 +134,10 @@ public class ProductController {
     })
     public ResponseEntity<ProductResponse> decreaseStock(
             @Parameter(description = "Product ID", required = true)
-            @RequestParam UUID id,
+            @RequestParam(name = "id") UUID id,
 
             @Parameter(description = "Quantity to decrease", example = "1", required = true)
-            @RequestParam int quantity) {
+            @RequestParam(name = "quantity") int quantity) {
 
         log.info("REST request to decrease stock for product {} by {}", id, quantity);
 
@@ -156,92 +156,16 @@ public class ProductController {
     })
     public ResponseEntity<ProductResponse> increaseStock(
             @Parameter(description = "Product ID", required = true)
-            @RequestParam UUID id,
+            @RequestParam(name = "id") UUID id,
 
             @Parameter(description = "Quantity to increase", example = "5", required = true)
-            @RequestParam int quantity) {
+            @RequestParam(name = "quantity") int quantity) {
 
         log.info("REST request to increase stock for product {} by {}", id, quantity);
 
         Product product = productService.increaseStock(id, quantity);
 
         return ResponseEntity.ok(ProductMapper.toResponse(product));
-    }
-
-    @GetMapping("/by-creator")
-    @Operation(summary = "Get products by creator", description = "Returns paginated list of products by creator ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Products successfully retrieved",
-                    content = @Content(schema = @Schema(implementation = PageResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Creator ID is required")
-    })
-    public ResponseEntity<PageResponse<ProductSummaryResponse>> getProductsByCreator(
-            @Parameter(description = "Creator ID", required = true)
-            @RequestParam UUID creatorId,
-
-            @Parameter(description = "Page number (0-based)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
-
-            @Parameter(description = "Page size", example = "20")
-            @RequestParam(defaultValue = "20") int size) {
-
-        log.info("REST request to get products by creator: {}, page: {}, size: {}",
-                creatorId, page, size);
-
-        PageRequest pageRequest = PageRequest.builder()
-                .page(page)
-                .size(size)
-                .build();
-
-        PageResponse<Product> products = productService.getProductsByCreator(creatorId, pageRequest);
-
-        PageResponse<ProductSummaryResponse> response = PageResponse.of(
-                products.getContent().stream()
-                        .map(ProductMapper::toSummaryResponse)
-                        .toList(),
-                pageRequest,
-                products.getTotalElements()
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    @GetMapping("/by-category")
-    @Operation(summary = "Get products by category", description = "Returns paginated list of products by category ID")
-    @ApiResponses(value = {
-            @ApiResponse(responseCode = "200", description = "Products successfully retrieved",
-                    content = @Content(schema = @Schema(implementation = PageResponse.class))),
-            @ApiResponse(responseCode = "400", description = "Category ID is required")
-    })
-    public ResponseEntity<PageResponse<ProductSummaryResponse>> getProductsByCategory(
-            @Parameter(description = "Category ID", required = true)
-            @RequestParam(name = "categoryId") UUID categoryId,
-
-            @Parameter(description = "Page number (0-based)", example = "0")
-            @RequestParam(defaultValue = "0", name = "page") int page,
-
-            @Parameter(description = "Page size", example = "20")
-            @RequestParam(defaultValue = "20", name = "size") int size) {
-
-        log.info("REST request to get products by category: {}, page: {}, size: {}",
-                categoryId, page, size);
-
-        PageRequest pageRequest = PageRequest.builder()
-                .page(page)
-                .size(size)
-                .build();
-
-        PageResponse<Product> products = productService.getProductsByCategory(categoryId, pageRequest);
-
-        PageResponse<ProductSummaryResponse> response = PageResponse.of(
-                products.getContent().stream()
-                        .map(ProductMapper::toSummaryResponse)
-                        .toList(),
-                pageRequest,
-                products.getTotalElements()
-        );
-
-        return ResponseEntity.ok(response);
     }
 
     @GetMapping("/available")

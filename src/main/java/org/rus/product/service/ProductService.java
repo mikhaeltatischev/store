@@ -138,22 +138,6 @@ public class ProductService {
     }
 
     /**
-     * Get all products by creator ID
-     */
-    @Transactional(readOnly = true)
-    public PageResponse<Product> getProductsByCreator(UUID creatorId, PageRequest pageRequest) {
-        log.trace("Fetching products for creator: {}, page: {}, size: {}",
-                creatorId, pageRequest.getPage(), pageRequest.getSize());
-
-        PageResponse<Product> result = productRepository.findByCreatorId(creatorId, pageRequest);
-
-        log.trace("Found {} products for creator {} (total: {})",
-                result.getContent().size(), creatorId, result.getTotalElements());
-
-        return result;
-    }
-
-    /**
      * Get available products (count greater than 0)
      */
     @Transactional(readOnly = true)
@@ -165,22 +149,6 @@ public class ProductService {
 
         log.trace("Found {} available products (total: {})",
                 result.getContent().size(), result.getTotalElements());
-
-        return result;
-    }
-
-    /**
-     * Get products by category
-     */
-    @Transactional(readOnly = true)
-    public PageResponse<Product> getProductsByCategory(UUID categoryId, PageRequest pageRequest) {
-        log.trace("Fetching products for category: {}, page: {}, size: {}",
-                categoryId, pageRequest.getPage(), pageRequest.getSize());
-
-        PageResponse<Product> result = productRepository.findByCategoryId(categoryId, pageRequest);
-
-        log.trace("Found {} products for category {} (total: {})",
-                result.getContent().size(), categoryId, result.getTotalElements());
 
         return result;
     }

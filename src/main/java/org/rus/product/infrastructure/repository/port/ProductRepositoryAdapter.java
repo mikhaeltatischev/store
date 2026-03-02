@@ -40,28 +40,6 @@ public class ProductRepositoryAdapter implements ProductRepository {
     }
 
     @Override
-    public PageResponse<Product> findByCreatorId(UUID creatorId, PageRequest pageRequest) {
-        log.debug("Finding products by creator: {}, page: {}, size: {}",
-                creatorId, pageRequest.getPage(), pageRequest.getSize());
-
-        Pageable pageable = createPageable(pageRequest);
-        Page<ProductEntity> page = jpaRepository.findByCreatorId(creatorId, pageable);
-
-        return createPageResponse(page, pageRequest);
-    }
-
-    @Override
-    public PageResponse<Product> findByCategoryId(UUID categoryId, PageRequest pageRequest) {
-        log.debug("Finding products by category: {}, page: {}, size: {}",
-                categoryId, pageRequest.getPage(), pageRequest.getSize());
-
-        Pageable pageable = createPageable(pageRequest);
-        Page<ProductEntity> page = jpaRepository.findByCategoryId(categoryId, pageable);
-
-        return createPageResponse(page, pageRequest);
-    }
-
-    @Override
     public PageResponse<Product> findAvailableProducts(PageRequest pageRequest) {
         log.debug("Finding available products, page: {}, size: {}",
                 pageRequest.getPage(), pageRequest.getSize());

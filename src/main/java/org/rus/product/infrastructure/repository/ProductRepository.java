@@ -13,8 +13,6 @@ public interface ProductRepository {
     Optional<Product> findById(UUID id);
     void delete(Product product);
 
-    PageResponse<Product> findByCreatorId(UUID creatorId, PageRequest pageRequest);
-    PageResponse<Product> findByCategoryId(UUID categoryId, PageRequest pageRequest);
     PageResponse<Product> findAvailableProducts(PageRequest pageRequest);
 
 }
