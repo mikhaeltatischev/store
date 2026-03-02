@@ -89,13 +89,13 @@ public class ProductService {
     public Product updateProductDetails(UUID productId, String name, String brand,
                                         String shortDescription, String description,
                                         String keywords, Double discount,
-                                        UUID categoryId, UUID editorId, Double price) {
+                                        UUID categoryId, UUID editorId, Double price, Integer count) {
         log.trace("Updating details for product {} by editor {}", productId, editorId);
 
         Product product = getProduct(productId);
 
         product.updateDetails(name, brand, shortDescription, description,
-                keywords, discount, categoryId, editorId, price);
+                keywords, discount, categoryId, editorId, price, count);
 
         Product updated = productRepository.save(product);
 

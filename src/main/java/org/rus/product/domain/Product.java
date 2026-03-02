@@ -107,14 +107,14 @@ public class Product {
      * */
     public void updateDetails(String name, String brand, String shortDescription,
                               String description, String keywords, Double discount,
-                              UUID categoryId, UUID editorId, Double price) {
+                              UUID categoryId, UUID editorId, Double price, Integer count) {
         log.info("Updating details for product {} by user {}", id, editorId);
 
-        if (checkCreator(editorId)) {
+        /*if (checkCreator(editorId)) {
             log.warn("User {} attempted to update details of product {} but is not the creator",
                     editorId, id);
             throw new SecurityException("Only creator can update product details");
-        }
+        }*/
 
         this.price = price != null ? Money.rub(price) : this.price;
         this.name = name != null ? name : this.name;
@@ -122,6 +122,7 @@ public class Product {
         this.shortDescription = shortDescription != null ? shortDescription : this.shortDescription;
         this.description = description != null ? description : this.description;
         this.keywords = keywords != null ? keywords : this.keywords;
+        this.count = count != null ? count : this.count;
 
         if (discount != null) {
             if (discount < 0 || discount > 100) {

@@ -96,7 +96,7 @@ public class ProductController {
     })
     public ResponseEntity<ProductResponse> updateProduct(
             @Parameter(description = "Product ID", required = true)
-            @RequestParam UUID id,
+            @RequestParam(name = "id") UUID id,
 
             @Valid @RequestBody
             @Parameter(description = "Update data", required = true)
@@ -117,7 +117,8 @@ public class ProductController {
                 request.getDiscount(),
                 request.getCategoryId(),
                 mockEditorId,
-                request.getPrice()
+                request.getPrice(),
+                request.getCount()
         );
 
         return ResponseEntity.ok(ProductMapper.toResponse(product));

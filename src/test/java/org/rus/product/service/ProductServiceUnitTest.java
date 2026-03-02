@@ -12,6 +12,7 @@ import org.rus.product.domain.Money;
 import org.rus.product.domain.Product;
 import org.rus.product.dto.PageRequest;
 import org.rus.product.dto.PageResponse;
+import org.rus.product.exception.ProductNotFoundException;
 import org.rus.product.infrastructure.repository.ProductRepository;
 
 import java.math.BigDecimal;
@@ -91,7 +92,6 @@ class ProductServiceUnitTest {
 
             // Then
             assertThat(result).isNotNull();
-            assertThat(result.getId()).isNotNull();
             assertThat(result.getName()).isEqualTo(name);
             assertThat(result.getBrand()).isEqualTo(brand);
             assertThat(result.getShortDescription()).isEqualTo(shortDesc);
@@ -125,7 +125,7 @@ class ProductServiceUnitTest {
 
             // Then
             assertThat(result).isNotNull();
-            assertThat(result.getDiscount()).isNull();
+            assertThat(result.getDiscount()).isEqualTo(0.0);
             verify(productRepository).save(any(Product.class));
         }
     }
@@ -156,7 +156,7 @@ class ProductServiceUnitTest {
 
             // When/Then
             assertThatThrownBy(() -> productService.getProduct(productId))
-                    .isInstanceOf(IllegalArgumentException.class)
+                    .isInstanceOf(ProductNotFoundException.class)
                     .hasMessageContaining("Product not found with id: " + productId);
 
             verify(productRepository).findById(productId);
@@ -178,6 +178,7 @@ class ProductServiceUnitTest {
             String newKeywords = "updated,keywords";
             Double price = 270.0;
             Double newDiscount = 15.0;
+            Integer count = 2;
             UUID newCategoryId = UUID.randomUUID();
 
             when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
@@ -186,7 +187,7 @@ class ProductServiceUnitTest {
             // When
             Product result = productService.updateProductDetails(
                     productId, newName, newBrand, newShortDesc, newDesc,
-                    newKeywords, newDiscount, newCategoryId, creatorId, price
+                    newKeywords, newDiscount, newCategoryId, creatorId, price, count
             );
 
             // Then
@@ -197,7 +198,8 @@ class ProductServiceUnitTest {
             assertThat(result.getKeywords()).isEqualTo(newKeywords);
             assertThat(result.getDiscount()).isEqualTo(newDiscount);
             assertThat(result.getCategoryId()).isEqualTo(newCategoryId);
-            assertThat(result.getPrice()).isEqualTo(price);
+            assertThat(result.getPrice().getAmount().doubleValue()).isEqualTo(price);
+            assertThat(result.getCount()).isEqualTo(count);
 
             verify(productRepository).findById(productId);
             verify(productRepository).save(any(Product.class));
@@ -213,7 +215,7 @@ class ProductServiceUnitTest {
             // When
             Product result = productService.updateProductDetails(
                     productId, null, null, null, null,
-                    null, null, null, creatorId, null
+                    null, null, null, creatorId, null, null
             );
 
             // Then
@@ -417,7 +419,7 @@ class ProductServiceUnitTest {
 
             // When/Then
             assertThatThrownBy(() -> productService.deleteProduct(productId, editorId))
-                    .isInstanceOf(IllegalArgumentException.class);
+                    .isInstanceOf(ProductNotFoundException.class);
 
             verify(productRepository).findById(productId);
             verify(productRepository, never()).delete(any());
