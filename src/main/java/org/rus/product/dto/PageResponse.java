@@ -27,7 +27,7 @@ public class PageResponse<T> {
     @Schema(description = "Page size", example = "20")
     private int size;
 
-    @Schema(description = "Total number of elements", example = "1543")
+    @Schema(description = "Total number of elements", example = "19")
     private long totalElements;
 
     @Schema(description = "Total number of pages", example = "78")
