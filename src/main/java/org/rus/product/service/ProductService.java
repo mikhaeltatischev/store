@@ -69,7 +69,6 @@ public class ProductService {
     /**
      * Get product by ID
      */
-    @Transactional(readOnly = true)
     public Product getProduct(UUID productId) {
         log.trace("Fetching product by id: {}", productId);
 
@@ -140,7 +139,6 @@ public class ProductService {
     /**
      * Get available products (count greater than 0)
      */
-    @Transactional(readOnly = true)
     public PageResponse<Product> getAvailableProducts(PageRequest pageRequest) {
         log.trace("Fetching available products, page: {}, size: {}",
                 pageRequest.getPage(), pageRequest.getSize());
