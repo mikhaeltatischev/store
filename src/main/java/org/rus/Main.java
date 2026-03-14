@@ -14,7 +14,7 @@ import java.util.TimeZone;
 
 @Slf4j
 @SpringBootApplication
-@EnableJpaRepositories(basePackages = "org.rus.product.infrastructure")
+@EnableJpaRepositories(basePackages = "org.rus.product.entity")
 @EnableTransactionManagement
 @EnableJpaAuditing
 public class Main {
