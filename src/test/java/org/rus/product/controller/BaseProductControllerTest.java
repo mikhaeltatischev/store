@@ -25,9 +25,6 @@ public abstract class BaseProductControllerTest {
     @Autowired
     protected ObjectMapper objectMapper;
 
-    @Autowired
-    protected JdbcTemplate jdbcTemplate;
-
     protected UUID createTestProduct(String name, double price, Integer count, Double discount) throws Exception {
         CreateProductRequest request = CreateProductRequest.builder()
                 .name(name)
@@ -47,4 +44,5 @@ public abstract class BaseProductControllerTest {
         ProductResponse response = objectMapper.readValue(responseJson, ProductResponse.class);
         return response.getId();
     }
+
 }

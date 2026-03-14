@@ -49,16 +49,6 @@ class ProductControllerIntegrationTest {
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @BeforeEach
-    void setUp() {
-        // Reset sequences if using PostgreSQL
-        try {
-            jdbcTemplate.execute("TRUNCATE TABLE products RESTART IDENTITY CASCADE");
-        } catch (Exception e) {
-            // Ignore if not PostgreSQL or table doesn't exist
-        }
-    }
-
     private ProductResponse createTestProduct(CreateProductRequest request) throws Exception {
         String requestBody = objectMapper.writeValueAsString(request);
 
@@ -72,328 +62,6 @@ class ProductControllerIntegrationTest {
                 result.getResponse().getContentAsString(),
                 ProductResponse.class
         );
-    }
-
-    @Nested
-    @DisplayName("POST /products - Create Product")
-    class CreateProductTests {
-
-        private CreateProductRequest validRequest;
-
-        @BeforeEach
-        void init() {
-            validRequest = CreateProductRequest.builder()
-                    .name("iPhone 15 Pro")
-                    .brand("Apple")
-                    .shortDescription("Latest flagship smartphone")
-                    .description("The iPhone 15 Pro features an advanced camera system, A17 Pro chip, and titanium design")
-                    .keywords("iphone, smartphone, apple, ios")
-                    .price(999.99)
-                    .count(50)
-                    .discount(10.0)
-                    .categoryId(UUID.randomUUID())
-                    .build();
-        }
-
-        @Test
-        @DisplayName("Should successfully create a product with valid data")
-        void shouldCreateProductSuccessfully() throws Exception {
-            // Given
-            String requestBody = objectMapper.writeValueAsString(validRequest);
-
-            // When & Then
-            MvcResult result = mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isCreated())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(jsonPath("$.id", notNullValue()))
-                    .andExpect(jsonPath("$.name", is(validRequest.getName())))
-                    .andExpect(jsonPath("$.brand", is(validRequest.getBrand())))
-                    .andExpect(jsonPath("$.shortDescription", is(validRequest.getShortDescription())))
-                    .andExpect(jsonPath("$.description", is(validRequest.getDescription())))
-                    .andExpect(jsonPath("$.keywords", is(validRequest.getKeywords())))
-                    .andExpect(jsonPath("$.price", is(999.99)))
-                    .andExpect(jsonPath("$.currency", is("RUB")))
-                    .andExpect(jsonPath("$.finalPrice", is(899.99)))
-                    .andExpect(jsonPath("$.count", is(validRequest.getCount())))
-                    .andExpect(jsonPath("$.discount", is(validRequest.getDiscount())))
-                    .andExpect(jsonPath("$.categoryId", is(validRequest.getCategoryId().toString())))
-                    .andExpect(jsonPath("$.creatorId", notNullValue()))
-                    .andExpect(jsonPath("$.status", is("CREATED")))
-                    .andExpect(jsonPath("$.available", is(false)))
-                    .andExpect(jsonPath("$.createdAt", notNullValue()))
-                    .andExpect(jsonPath("$.lastModifiedAt", notNullValue()))
-                    .andReturn();
-
-            // Verify product was saved in database
-            ProductResponse response = objectMapper.readValue(
-                    result.getResponse().getContentAsString(),
-                    ProductResponse.class
-            );
-
-            Product savedProduct = productRepository.findById(response.getId()).orElse(null);
-            assertThat(savedProduct).isNotNull();
-            assertThat(savedProduct.getName()).isEqualTo(validRequest.getName());
-            assertThat(savedProduct.getPrice().getAmount()).isEqualTo(BigDecimal.valueOf(validRequest.getPrice()));
-        }
-
-        @Test
-        @DisplayName("Should successfully create multiple products sequentially")
-        void shouldCreateMultipleProductsSuccessfully() throws Exception {
-            // Given - First product
-            CreateProductRequest firstProduct = validRequest;
-
-            // Given - Second product with different category
-            UUID secondCategoryId = UUID.randomUUID();
-            CreateProductRequest secondProduct = CreateProductRequest.builder()
-                    .name("Samsung Galaxy S24")
-                    .brand("Samsung")
-                    .shortDescription("Premium Android smartphone")
-                    .description("Galaxy S24 with AI features and amazing display")
-                    .keywords("samsung, galaxy, android, smartphone")
-                    .price(899.99)
-                    .count(30)
-                    .discount(5.0)
-                    .categoryId(secondCategoryId)
-                    .build();
-
-            // When & Then - Create first product and capture its ID
-            MvcResult firstResult = mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(firstProduct)))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.id", notNullValue()))
-                    .andExpect(jsonPath("$.name", is(firstProduct.getName())))
-                    .andReturn();
-
-            // When & Then - Create second product and capture its ID
-            MvcResult secondResult = mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(objectMapper.writeValueAsString(secondProduct)))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.id", notNullValue()))
-                    .andExpect(jsonPath("$.name", is(secondProduct.getName())))
-                    .andReturn();
-
-            // Extract IDs from responses
-            ProductResponse firstResponse = objectMapper.readValue(
-                    firstResult.getResponse().getContentAsString(),
-                    ProductResponse.class
-            );
-
-            ProductResponse secondResponse = objectMapper.readValue(
-                    secondResult.getResponse().getContentAsString(),
-                    ProductResponse.class
-            );
-
-            // Verify first product exists in database by ID
-            Product savedFirstProduct = productRepository.findById(firstResponse.getId()).orElse(null);
-            assertThat(savedFirstProduct).isNotNull();
-            assertThat(savedFirstProduct.getName()).isEqualTo(firstProduct.getName());
-            assertThat(savedFirstProduct.getCategoryId()).isEqualTo(firstProduct.getCategoryId());
-
-            // Verify second product exists in database by ID
-            Product savedSecondProduct = productRepository.findById(secondResponse.getId()).orElse(null);
-            assertThat(savedSecondProduct).isNotNull();
-            assertThat(savedSecondProduct.getName()).isEqualTo(secondProduct.getName());
-            assertThat(savedSecondProduct.getCategoryId()).isEqualTo(secondProduct.getCategoryId());
-        }
-
-        @Test
-        @DisplayName("Should create product with only required fields")
-        void shouldCreateProductWithOnlyRequiredFields() throws Exception {
-            String name = "Minimal Product";
-            String shortDescription = "Short description";
-            String fullDescription = "Full description";
-            Double price = 199.99;
-            int count = 1;
-
-            // Given
-            CreateProductRequest minimalRequest = CreateProductRequest.builder()
-                    .name(name)
-                    .shortDescription(shortDescription)
-                    .description(fullDescription)
-                    .price(price)
-                    .count(count)
-                    .build();
-
-            String requestBody = objectMapper.writeValueAsString(minimalRequest);
-
-            // When & Then
-            mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isCreated())
-                    .andExpect(jsonPath("$.id", notNullValue()))
-                    .andExpect(jsonPath("$.name", is(minimalRequest.getName())))
-                    .andExpect(jsonPath("$.brand", nullValue()))
-                    .andExpect(jsonPath("$.shortDescription", is(minimalRequest.getShortDescription())))
-                    .andExpect(jsonPath("$.description", is(minimalRequest.getDescription())))
-                    .andExpect(jsonPath("$.keywords", nullValue()))
-                    .andExpect(jsonPath("$.price", is(minimalRequest.getPrice())))
-                    .andExpect(jsonPath("$.finalPrice", is(minimalRequest.getPrice()))) // No discount
-                    .andExpect(jsonPath("$.count", is(minimalRequest.getCount()))) // Default count
-                    .andExpect(jsonPath("$.discount", is(0.0))) // Default discount
-                    .andExpect(jsonPath("$.categoryId", nullValue()))
-                    .andExpect(jsonPath("$.status", is("CREATED"))) // Default status after create
-                    .andExpect(jsonPath("$.available", is(false))); // count = 1, status = created - so not available
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when product name is missing")
-        void shouldReturnBadRequestWhenNameIsMissing() throws Exception {
-            // Given
-            CreateProductRequest invalidRequest = CreateProductRequest.builder()
-                    .brand("Apple")
-                    .price(999.99)
-                    .build();
-
-            String requestBody = objectMapper.writeValueAsString(invalidRequest);
-
-            // When & Then
-            mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when name is too short")
-        void shouldReturnBadRequestWhenNameIsTooShort() throws Exception {
-            // Given
-            CreateProductRequest invalidRequest = CreateProductRequest.builder()
-                    .name("IP") // Less than 3 characters
-                    .brand("Apple")
-                    .price(999.99)
-                    .build();
-
-            String requestBody = objectMapper.writeValueAsString(invalidRequest);
-
-            // When & Then
-            mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when price is missing")
-        void shouldReturnBadRequestWhenPriceIsMissing() throws Exception {
-            // Given
-            CreateProductRequest invalidRequest = CreateProductRequest.builder()
-                    .name("iPhone 15 Pro")
-                    .brand("Apple")
-                    .build();
-
-            String requestBody = objectMapper.writeValueAsString(invalidRequest);
-
-            // When & Then
-            mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when price is zero")
-        void shouldReturnBadRequestWhenPriceIsZero() throws Exception {
-            // Given
-            CreateProductRequest invalidRequest = CreateProductRequest.builder()
-                    .name("iPhone 15 Pro")
-                    .brand("Apple")
-                    .price(0.0)
-                    .build();
-
-            String requestBody = objectMapper.writeValueAsString(invalidRequest);
-
-            // When & Then
-            mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when price exceeds maximum")
-        void shouldReturnBadRequestWhenPriceExceedsMaximum() throws Exception {
-            // Given
-            CreateProductRequest invalidRequest = CreateProductRequest.builder()
-                    .name("iPhone 15 Pro")
-                    .brand("Apple")
-                    .price(10_000_000.0) // Exceeds max
-                    .build();
-
-            String requestBody = objectMapper.writeValueAsString(invalidRequest);
-
-            // When & Then
-            mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when discount exceeds 100%")
-        void shouldReturnBadRequestWhenDiscountExceeds100() throws Exception {
-            // Given
-            CreateProductRequest invalidRequest = CreateProductRequest.builder()
-                    .name("iPhone 15 Pro")
-                    .brand("Apple")
-                    .price(999.99)
-                    .discount(150.0) // Exceeds 100%
-                    .build();
-
-            String requestBody = objectMapper.writeValueAsString(invalidRequest);
-
-            // When & Then
-            mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when description exceeds max length")
-        void shouldReturnBadRequestWhenDescriptionTooLong() throws Exception {
-            // Given
-            String veryLongDescription = "a".repeat(2001); // Exceeds 2000 characters
-
-            CreateProductRequest invalidRequest = CreateProductRequest.builder()
-                    .name("iPhone 15 Pro")
-                    .brand("Apple")
-                    .price(999.99)
-                    .description(veryLongDescription)
-                    .build();
-
-            String requestBody = objectMapper.writeValueAsString(invalidRequest);
-
-            // When & Then
-            mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when count is negative")
-        void shouldReturnBadRequestWhenCountIsNegative() throws Exception {
-            // Given
-            CreateProductRequest invalidRequest = CreateProductRequest.builder()
-                    .name("iPhone 15 Pro")
-                    .brand("Apple")
-                    .price(999.99)
-                    .count(-5)
-                    .build();
-
-            String requestBody = objectMapper.writeValueAsString(invalidRequest);
-
-            // When & Then
-            mockMvc.perform(post("/products")
-                            .contentType(MediaType.APPLICATION_JSON)
-                            .content(requestBody))
-                    .andExpect(status().isBadRequest());
-        }
     }
 
     @Nested
@@ -597,9 +265,6 @@ class ProductControllerIntegrationTest {
                     ProductResponse.class
             );
 
-            // Expected final price: 1000.00 - (1000.00 * 25.5 / 100) = 745.00
-            BigDecimal expectedFinalPrice = new BigDecimal("745.00");
-
             // When & Then
             mockMvc.perform(get("/products")
                             .param("id", discountProduct.getId().toString()))
@@ -607,6 +272,7 @@ class ProductControllerIntegrationTest {
                     .andExpect(jsonPath("$.id", is(discountProduct.getId().toString())))
                     .andExpect(jsonPath("$.price", is(1000.00)))
                     .andExpect(jsonPath("$.discount", is(25.5)))
+                    // Expected final price: 1000.00 - (1000.00 * 25.5 / 100) = 745.00
                     .andExpect(jsonPath("$.finalPrice", is(745.00)));
         }
 
@@ -700,7 +366,7 @@ class ProductControllerIntegrationTest {
             String requestBody = objectMapper.writeValueAsString(updateRequest);
 
             // When & Then
-            MvcResult result = mockMvc.perform(put("/products")
+            mockMvc.perform(put("/products")
                             .param("id", existingProductId.toString())
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
@@ -986,6 +652,7 @@ class ProductControllerIntegrationTest {
                             .contentType(MediaType.APPLICATION_JSON)
                             .content(requestBody))
                     .andExpect(status().isOk())
+                    // Fields must remain old
                     .andExpect(jsonPath("$.id", is(existingProductId.toString())))
                     .andExpect(jsonPath("$.name", is(updateRequest.getName())))
                     .andExpect(jsonPath("$.brand", is(originalProduct.getBrand())))
@@ -1310,6 +977,7 @@ class ProductControllerIntegrationTest {
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.id", is(productId.toString())))
                     .andExpect(jsonPath("$.count", is(increaseQuantity)))
+                    // Attention - after add moderating this test will be failed
                     .andExpect(jsonPath("$.available", is(true))); // Should become true again
 
             // Verify in database
