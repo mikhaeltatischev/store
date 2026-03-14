@@ -176,15 +176,15 @@ public class ProductController {
     })
     public ResponseEntity<PageResponse<ProductSummaryResponse>> getAvailableProducts(
             @Parameter(description = "Page number (0-based)", example = "0")
-            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "0", name = "page") int page,
 
             @Parameter(description = "Page size", example = "20")
-            @RequestParam(defaultValue = "20") int size) {
+            @RequestParam(defaultValue = "20", name = "size") int size) {
 
         log.info("REST request to get available products, page: {}, size: {}", page, size);
 
         PageRequest pageRequest = PageRequest.builder()
-                .page(page)
+                .page(page < 0 ? 0 : page)
                 .size(size)
                 .build();
 
@@ -211,7 +211,7 @@ public class ProductController {
     })
     public ResponseEntity<Void> deleteProduct(
             @Parameter(description = "Product ID", required = true)
-            @RequestParam UUID id) {
+            @RequestParam(name = "id") UUID id) {
 
         log.info("REST request to delete product: {}", id);
 
