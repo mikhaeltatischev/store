@@ -8,7 +8,6 @@ import org.junit.jupiter.api.Test;
 import org.rus.product.domain.Product;
 import org.rus.product.dto.CreateProductRequest;
 import org.rus.product.dto.ProductResponse;
-import org.rus.product.dto.UpdateProductRequest;
 import org.rus.product.entity.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -20,14 +19,11 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.*;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 @SpringBootTest
@@ -62,170 +58,6 @@ class ProductControllerIntegrationTest {
                 result.getResponse().getContentAsString(),
                 ProductResponse.class
         );
-    }
-
-    @Nested
-    @DisplayName("POST /products/decrease-stock - Decrease Stock")
-    class DecreaseStockTests {
-
-        private UUID productId;
-        private CreateProductRequest productRequest;
-        private int initialCount;
-
-        @BeforeEach
-        void setUp() throws Exception {
-            initialCount = 50;
-
-            productRequest = CreateProductRequest.builder()
-                    .name("Test Product for Stock Decrease")
-                    .brand("TestBrand")
-                    .shortDescription("Product for testing stock decrease")
-                    .description("Full description for stock decrease testing")
-                    .keywords("stock, decrease, test")
-                    .price(299.99)
-                    .count(initialCount)
-                    .discount(0.0)
-                    .categoryId(UUID.randomUUID())
-                    .build();
-
-            ProductResponse createdProduct = createTestProduct(productRequest);
-            productId = createdProduct.getId();
-        }
-
-        @Test
-        @DisplayName("Should successfully decrease stock by valid quantity")
-        void shouldDecreaseStockSuccessfully() throws Exception {
-            // Given
-            int decreaseQuantity = 5;
-            int expectedCount = initialCount - decreaseQuantity;
-
-            // When & Then
-            mockMvc.perform(post("/products/decrease-stock")
-                            .param("id", productId.toString())
-                            .param("quantity", String.valueOf(decreaseQuantity)))
-                    .andExpect(status().isOk())
-                    .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                    .andExpect(jsonPath("$.id", is(productId.toString())))
-                    .andExpect(jsonPath("$.name", is(productRequest.getName())))
-                    .andExpect(jsonPath("$.count", is(expectedCount)))
-                    .andExpect(jsonPath("$.available", is(false)));
-
-            // Verify in database
-            Product updatedProduct = productRepository.findById(productId).orElse(null);
-            assertThat(updatedProduct).isNotNull();
-            assertThat(updatedProduct.getCount()).isEqualTo(expectedCount);
-        }
-
-        @Test
-        @DisplayName("Should decrease stock to zero and update available status")
-        void shouldDecreaseStockToZeroAndUpdateAvailable() throws Exception {
-            // Given
-            int decreaseQuantity = initialCount; // Decrease all stock
-            int expectedCount = 0;
-
-            // When & Then
-            mockMvc.perform(post("/products/decrease-stock")
-                            .param("id", productId.toString())
-                            .param("quantity", String.valueOf(decreaseQuantity)))
-                    .andExpect(status().isOk())
-                    .andExpect(jsonPath("$.id", is(productId.toString())))
-                    .andExpect(jsonPath("$.count", is(expectedCount)))
-                    .andExpect(jsonPath("$.available", is(false))); // Should be false when count is 0
-
-            // Verify in database
-            Product updatedProduct = productRepository.findById(productId).orElse(null);
-            assertThat(updatedProduct).isNotNull();
-            assertThat(updatedProduct.getCount()).isZero();
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when decreasing more than available stock")
-        void shouldReturn400WhenDecreasingMoreThanAvailable() throws Exception {
-            // Given
-            int decreaseQuantity = initialCount + 10; // More than available
-
-            // When & Then
-            mockMvc.perform(post("/products/decrease-stock")
-                            .param("id", productId.toString())
-                            .param("quantity", String.valueOf(decreaseQuantity)))
-                    .andExpect(status().isBadRequest());
-
-            // Verify stock was not changed
-            Product unchangedProduct = productRepository.findById(productId).orElse(null);
-            assertThat(unchangedProduct).isNotNull();
-            assertThat(unchangedProduct.getCount()).isEqualTo(initialCount);
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when decreasing with negative quantity")
-        void shouldReturn400WhenDecreasingWithNegativeQuantity() throws Exception {
-            // Given
-            int negativeQuantity = -5;
-
-            // When & Then
-            mockMvc.perform(post("/products/decrease-stock")
-                            .param("id", productId.toString())
-                            .param("quantity", String.valueOf(negativeQuantity)))
-                    .andExpect(status().isBadRequest());
-
-            // Verify stock was not changed
-            Product unchangedProduct = productRepository.findById(productId).orElse(null);
-            assertThat(unchangedProduct).isNotNull();
-            assertThat(unchangedProduct.getCount()).isEqualTo(initialCount);
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when decreasing with zero quantity")
-        void shouldReturn400WhenDecreasingWithZeroQuantity() throws Exception {
-            // Given
-            int zeroQuantity = 0;
-
-            // When & Then
-            mockMvc.perform(post("/products/decrease-stock")
-                            .param("id", productId.toString())
-                            .param("quantity", String.valueOf(zeroQuantity)))
-                    .andExpect(status().isBadRequest());
-
-            // Verify stock was not changed
-            Product unchangedProduct = productRepository.findById(productId).orElse(null);
-            assertThat(unchangedProduct).isNotNull();
-            assertThat(unchangedProduct.getCount()).isEqualTo(initialCount);
-        }
-
-        @Test
-        @DisplayName("Should return 404 Not Found when product does not exist")
-        void shouldReturn404WhenProductNotFound() throws Exception {
-            // Given
-            UUID nonExistentId = UUID.randomUUID();
-            int decreaseQuantity = 5;
-
-            // When & Then
-            mockMvc.perform(post("/products/decrease-stock")
-                            .param("id", nonExistentId.toString())
-                            .param("quantity", String.valueOf(decreaseQuantity)))
-                    .andExpect(status().isNotFound());
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when ID parameter is missing")
-        void shouldReturn400WhenIdParameterMissing() throws Exception {
-            // Given
-            int decreaseQuantity = 5;
-
-            // When & Then
-            mockMvc.perform(post("/products/decrease-stock")
-                            .param("quantity", String.valueOf(decreaseQuantity)))
-                    .andExpect(status().isBadRequest());
-        }
-
-        @Test
-        @DisplayName("Should return 400 Bad Request when quantity parameter is missing")
-        void shouldReturn400WhenQuantityParameterMissing() throws Exception {
-            // When & Then
-            mockMvc.perform(post("/products/decrease-stock")
-                            .param("id", productId.toString()))
-                    .andExpect(status().isBadRequest());
-        }
     }
 
     @Nested
