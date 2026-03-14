@@ -44,7 +44,7 @@ public class ProductService {
         // Create domain model
         Product product = Product.builder()
                 .name(name)
-                .status(Status.CREATED)
+                .status(count > 0 ? Status.ACTIVE : Status.CREATED)
                 .createdAt(LocalDateTime.now())
                 .brand(brand)
                 .shortDescription(shortDescription)
