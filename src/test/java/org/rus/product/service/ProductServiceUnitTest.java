@@ -72,7 +72,6 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should create product successfully")
         void shouldCreateProductSuccessfully() {
-            // Given
             String name = "New Product";
             String brand = "New Brand";
             String shortDesc = "Short desc";
@@ -84,13 +83,11 @@ class ProductServiceUnitTest {
 
             when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-            // When
             Product result = productService.createProduct(
                     name, brand, shortDesc, desc, keywords,
                     price, count, discount, categoryId, creatorId
             );
 
-            // Then
             assertThat(result).isNotNull();
             assertThat(result.getName()).isEqualTo(name);
             assertThat(result.getBrand()).isEqualTo(brand);
@@ -114,16 +111,13 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should create product with null discount")
         void shouldCreateProductWithNullDiscount() {
-            // Given
             when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-            // When
             Product result = productService.createProduct(
                     "Product", "Brand", "Short", "Desc", "keywords",
                     100.0, 5, null, categoryId, creatorId
             );
 
-            // Then
             assertThat(result).isNotNull();
             assertThat(result.getDiscount()).isEqualTo(0.0);
             verify(productRepository).save(any(Product.class));
@@ -137,13 +131,10 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should return product when found")
         void shouldReturnProductWhenFound() {
-            // Given
             when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
 
-            // When
             Product result = productService.getProduct(productId);
 
-            // Then
             assertThat(result).isEqualTo(testProduct);
             verify(productRepository).findById(productId);
         }
@@ -151,10 +142,8 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should throw exception when product not found")
         void shouldThrowExceptionWhenProductNotFound() {
-            // Given
             when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
-            // When/Then
             assertThatThrownBy(() -> productService.getProduct(productId))
                     .isInstanceOf(ProductNotFoundException.class)
                     .hasMessageContaining("Product not found with id: " + productId);
@@ -170,7 +159,6 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should update product details successfully")
         void shouldUpdateProductDetailsSuccessfully() {
-            // Given
             String newName = "Updated Name";
             String newBrand = "Updated Brand";
             String newShortDesc = "Updated Short Desc";
@@ -184,13 +172,11 @@ class ProductServiceUnitTest {
             when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
             when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-            // When
             Product result = productService.updateProductDetails(
                     productId, newName, newBrand, newShortDesc, newDesc,
                     newKeywords, newDiscount, newCategoryId, creatorId, price, count
             );
 
-            // Then
             assertThat(result.getName()).isEqualTo(newName);
             assertThat(result.getBrand()).isEqualTo(newBrand);
             assertThat(result.getShortDescription()).isEqualTo(newShortDesc);
@@ -208,17 +194,14 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should update product details with null values")
         void shouldUpdateProductDetailsWithNullValues() {
-            // Given
             when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
             when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-            // When
             Product result = productService.updateProductDetails(
                     productId, null, null, null, null,
                     null, null, null, creatorId, null, null
             );
 
-            // Then
             assertThat(result).isNotNull();
             verify(productRepository).findById(productId);
             verify(productRepository).save(any(Product.class));
@@ -232,16 +215,13 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should decrease stock successfully")
         void shouldDecreaseStockSuccessfully() {
-            // Given
             int decreaseQuantity = 3;
             int initialCount = testProduct.getCount();
             when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
             when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-            // When
             Product result = productService.decreaseStock(productId, decreaseQuantity);
 
-            // Then
             assertThat(result.getCount()).isEqualTo(initialCount - decreaseQuantity);
             verify(productRepository).findById(productId);
             verify(productRepository).save(any(Product.class));
@@ -250,11 +230,9 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should throw exception when decreasing stock below zero")
         void shouldThrowExceptionWhenDecreasingBelowZero() {
-            // Given
             int decreaseQuantity = 20; // More than available
             when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
 
-            // When/Then
             assertThatThrownBy(() -> productService.decreaseStock(productId, decreaseQuantity))
                     .isInstanceOf(IllegalStateException.class);
 
@@ -265,16 +243,13 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should increase stock successfully")
         void shouldIncreaseStockSuccessfully() {
-            // Given
             int increaseQuantity = 5;
             int initialCount = testProduct.getCount();
             when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
             when(productRepository.save(any(Product.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-            // When
             Product result = productService.increaseStock(productId, increaseQuantity);
 
-            // Then
             assertThat(result.getCount()).isEqualTo(initialCount + increaseQuantity);
             verify(productRepository).findById(productId);
             verify(productRepository).save(any(Product.class));
@@ -288,7 +263,6 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should get available products")
         void shouldGetAvailableProducts() {
-            // Given
             PageResponse<Product> response = PageResponse.<Product>builder()
                     .content(List.of(testProduct))
                     .page(0)
@@ -303,10 +277,8 @@ class ProductServiceUnitTest {
             when(productRepository.findAvailableProducts(pageRequest))
                     .thenReturn(response);
 
-            // When
             PageResponse<Product> result = productService.getAvailableProducts(pageRequest);
 
-            // Then
             assertThat(result).isEqualTo(response);
             verify(productRepository).findAvailableProducts(pageRequest);
         }
@@ -319,14 +291,11 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should delete product successfully")
         void shouldDeleteProductSuccessfully() {
-            // Given
             when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
             doNothing().when(productRepository).delete(testProduct);
 
-            // When
             productService.deleteProduct(productId, editorId);
 
-            // Then
             verify(productRepository).findById(productId);
             verify(productRepository).delete(testProduct);
         }
@@ -334,10 +303,8 @@ class ProductServiceUnitTest {
         @Test
         @DisplayName("Should throw exception when deleting non-existent product")
         void shouldThrowExceptionWhenProductNotFound() {
-            // Given
             when(productRepository.findById(productId)).thenReturn(Optional.empty());
 
-            // When/Then
             assertThatThrownBy(() -> productService.deleteProduct(productId, editorId))
                     .isInstanceOf(ProductNotFoundException.class);
 
@@ -349,13 +316,10 @@ class ProductServiceUnitTest {
     @Test
     @DisplayName("Should verify repository interactions")
     void shouldVerifyRepositoryInteractions() {
-        // Given
         when(productRepository.findById(productId)).thenReturn(Optional.of(testProduct));
 
-        // When
         productService.getProduct(productId);
 
-        // Then
         verify(productRepository, times(1)).findById(productId);
         verifyNoMoreInteractions(productRepository);
     }

@@ -40,7 +40,6 @@ class ProductMapperTest {
         now = LocalDateTime.now();
 
         Money price = Money.rub(1000.00);
-        Money finalPrice = Money.rub(900.00); // со скидкой 10%
 
         product = Product.builder()
                 .id(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
@@ -87,10 +86,8 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should map Product to ProductResponse correctly")
         void shouldMapProductToProductResponse() {
-            // When
             ProductResponse response = ProductMapper.toResponse(product);
 
-            // Then
             assertThat(response.getId()).isEqualTo(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
             assertThat(response.getName()).isEqualTo("Test Product");
             assertThat(response.getBrand()).isEqualTo("Test Brand");
@@ -113,7 +110,6 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should handle null price fields")
         void shouldHandleNullPriceFields() {
-            // Given
             Product productWithNullPrice = Product.builder()
                     .id(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                     .name("Product Without Price")
@@ -121,10 +117,8 @@ class ProductMapperTest {
                     .lastModifiedAt(now)
                     .build();
 
-            // When
             ProductResponse response = ProductMapper.toResponse(productWithNullPrice);
 
-            // Then
             assertThat(response.getId()).isEqualTo(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
             assertThat(response.getName()).isEqualTo("Product Without Price");
             assertThat(response.getPrice()).isNull();
@@ -135,7 +129,6 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should handle null status")
         void shouldHandleNullStatus() {
-            // Given
             Product productWithNullStatus = Product.builder()
                     .id(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                     .name("Product Without Status")
@@ -145,10 +138,8 @@ class ProductMapperTest {
                     .status(null)
                     .build();
 
-            // When
             ProductResponse response = ProductMapper.toResponse(productWithNullStatus);
 
-            // Then
             assertThat(response.getStatus()).isNull();
         }
     }
@@ -160,10 +151,8 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should map Product to ProductSummaryResponse correctly")
         void shouldMapProductToProductSummaryResponse() {
-            // When
             ProductSummaryResponse response = ProductMapper.toSummaryResponse(product);
 
-            // Then
             assertThat(response.getId()).isEqualTo(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
             assertThat(response.getName()).isEqualTo("Test Product");
             assertThat(response.getBrand()).isEqualTo("Test Brand");
@@ -176,16 +165,13 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should handle null price and currency in summary response")
         void shouldHandleNullPriceAndCurrency() {
-            // Given
             Product productWithNullPrice = Product.builder()
                     .id(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                     .name("Product Without Price")
                     .build();
 
-            // When
             ProductSummaryResponse response = ProductMapper.toSummaryResponse(productWithNullPrice);
 
-            // Then
             assertThat(response.getId()).isEqualTo(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
             assertThat(response.getName()).isEqualTo("Product Without Price");
             assertThat(response.getFinalPrice()).isNull();
@@ -195,7 +181,6 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should handle null status in summary response")
         void shouldHandleNullStatus() {
-            // Given
             Product productWithNullStatus = Product.builder()
                     .id(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                     .name("Product Without Status")
@@ -203,10 +188,8 @@ class ProductMapperTest {
                     .status(null)
                     .build();
 
-            // When
             ProductSummaryResponse response = ProductMapper.toSummaryResponse(productWithNullStatus);
 
-            // Then
             assertThat(response.getStatus()).isNull();
         }
     }
@@ -218,10 +201,8 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should map Product to ProductEntity correctly")
         void shouldMapProductToProductEntity() {
-            // When
             ProductEntity entity = ProductMapper.fromDomain(product);
 
-            // Then
             assertThat(entity.getId()).isEqualTo(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
             assertThat(entity.getName()).isEqualTo("Test Product");
             assertThat(entity.getBrand()).isEqualTo("Test Brand");
@@ -243,7 +224,6 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should handle null price fields when mapping to entity")
         void shouldHandleNullPriceFields() {
-            // Given
             Product productWithoutPrice = Product.builder()
                     .id(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                     .name("Product Without Price")
@@ -252,10 +232,8 @@ class ProductMapperTest {
                     .lastModifiedAt(now)
                     .build();
 
-            // When
             ProductEntity entity = ProductMapper.fromDomain(productWithoutPrice);
 
-            // Then
             assertThat(entity.getPriceAmount()).isNull();
             assertThat(entity.getPriceCurrency()).isNull();
         }
@@ -263,7 +241,6 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should handle null timestamps")
         void shouldHandleNullTimestamps() {
-            // Given
             Product productWithNullTimestamps = Product.builder()
                     .id(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                     .name("Product With Null Timestamps")
@@ -273,10 +250,8 @@ class ProductMapperTest {
                     .deletedAt(null)
                     .build();
 
-            // When
             ProductEntity entity = ProductMapper.fromDomain(productWithNullTimestamps);
 
-            // Then
             assertThat(entity.getCreatedAt()).isNull();
             assertThat(entity.getLastModifiedAt()).isNull();
             assertThat(entity.getDeletedAt()).isNull();
@@ -290,10 +265,8 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should map ProductEntity to Product correctly")
         void shouldMapProductEntityToProduct() {
-            // When
             Product result = ProductMapper.toDomain(productEntity);
 
-            // Then
             assertThat(result.getId()).isEqualTo(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
             assertThat(result.getName()).isEqualTo("Test Product");
             assertThat(result.getBrand()).isEqualTo("Test Brand");
@@ -315,11 +288,9 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should throw exception when price fields are inconsistent")
         void shouldThrowExceptionWhenPriceFieldsInconsistent() {
-            // Given
             productEntity.setPriceAmount(new BigDecimal("1000.00"));
             productEntity.setPriceCurrency(null);
 
-            // When & Then
             assertThatThrownBy(() -> ProductMapper.toDomain(productEntity))
                     .isInstanceOf(NullPointerException.class);
         }
@@ -327,15 +298,12 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should handle null timestamps")
         void shouldHandleNullTimestamps() {
-            // Given
             productEntity.setCreatedAt(null);
             productEntity.setLastModifiedAt(null);
             productEntity.setDeletedAt(null);
 
-            // When
             Product result = ProductMapper.toDomain(productEntity);
 
-            // Then
             assertThat(result.getCreatedAt()).isNull();
             assertThat(result.getLastModifiedAt()).isNull();
             assertThat(result.getDeletedAt()).isNull();
@@ -349,14 +317,11 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should maintain data integrity when mapping domain -> entity -> domain")
         void shouldMaintainDataIntegrityInRoundTrip() {
-            // Given
             Product originalProduct = product;
 
-            // When
             ProductEntity entity = ProductMapper.fromDomain(originalProduct);
             Product resultProduct = ProductMapper.toDomain(entity);
 
-            // Then
             assertThat(resultProduct.getId()).isEqualTo(originalProduct.getId());
             assertThat(resultProduct.getName()).isEqualTo(originalProduct.getName());
             assertThat(resultProduct.getBrand()).isEqualTo(originalProduct.getBrand());
@@ -382,7 +347,6 @@ class ProductMapperTest {
         @Test
         @DisplayName("Should handle null values in round trip mapping")
         void shouldHandleNullValuesInRoundTrip() {
-            // Given
             Product productWithNulls = Product.builder()
                     .id(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"))
                     .name("Product With Nulls")
@@ -392,11 +356,9 @@ class ProductMapperTest {
                     .lastModifiedAt(now)
                     .build();
 
-            // When
             ProductEntity entity = ProductMapper.fromDomain(productWithNulls);
             Product result = ProductMapper.toDomain(entity);
 
-            // Then
             assertThat(result.getId()).isEqualTo(UUID.fromString("123e4567-e89b-12d3-a456-426614174000"));
             assertThat(result.getName()).isEqualTo("Product With Nulls");
             assertThat(result.getPrice()).isEqualTo(Money.rub(2));
