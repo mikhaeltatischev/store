@@ -13,7 +13,7 @@ import org.rus.product.domain.Product;
 import org.rus.product.dto.PageRequest;
 import org.rus.product.dto.PageResponse;
 import org.rus.product.exception.ProductNotFoundException;
-import org.rus.product.infrastructure.repository.ProductRepository;
+import org.rus.product.entity.repository.ProductRepository;
 
 import java.math.BigDecimal;
 import java.util.List;

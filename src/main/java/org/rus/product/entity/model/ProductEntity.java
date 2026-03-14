@@ -1,4 +1,4 @@
-package org.rus.product.infrastructure.model;
+package org.rus.product.entity.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -34,10 +34,10 @@ public class ProductEntity {
 
     private String keywords;  // example: Tool;hammer...etc..
 
-    @Column(nullable = false, precision = 10, scale = 2)
+    @Column(nullable = false, precision = 10, scale = 2, name = "price_amount")
     private BigDecimal priceAmount;
 
-    @Column(nullable = false, length = 3)
+    @Column(nullable = false, length = 3, name = "price_currency")
     private String priceCurrency;  // ISO currency code (RUB, USD, EUR)
 
     private Integer count;

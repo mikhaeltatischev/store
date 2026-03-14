@@ -7,7 +7,7 @@ import org.rus.product.dto.PageRequest;
 import org.rus.product.dto.PageResponse;
 import org.rus.product.enums.Status;
 import org.rus.product.exception.ProductNotFoundException;
-import org.rus.product.infrastructure.repository.ProductRepository;
+import org.rus.product.entity.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 

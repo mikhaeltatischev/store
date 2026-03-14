@@ -9,7 +9,7 @@ import org.rus.product.domain.Product;
 import org.rus.product.dto.CreateProductRequest;
 import org.rus.product.dto.ProductResponse;
 import org.rus.product.dto.UpdateProductRequest;
-import org.rus.product.infrastructure.repository.ProductRepository;
+import org.rus.product.entity.repository.ProductRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;

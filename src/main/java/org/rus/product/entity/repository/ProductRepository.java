@@ -1,4 +1,4 @@
-package org.rus.product.infrastructure.repository;
+package org.rus.product.entity.repository;
 
 import org.rus.product.domain.Product;
 import org.rus.product.dto.PageRequest;

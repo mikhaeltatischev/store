@@ -1,7 +1,7 @@
-package org.rus.product.infrastructure.repository;
+package org.rus.product.entity.repository;
 
 import org.rus.product.enums.Status;
-import org.rus.product.infrastructure.model.ProductEntity;
+import org.rus.product.entity.model.ProductEntity;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

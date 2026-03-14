@@ -1,13 +1,13 @@
-package org.rus.product.infrastructure.repository.port;
+package org.rus.product.entity.repository.port;
 
 import lombok.extern.slf4j.Slf4j;
 import org.rus.product.domain.Product;
 import org.rus.product.dto.PageRequest;
 import org.rus.product.dto.PageResponse;
 import org.rus.product.enums.Status;
-import org.rus.product.infrastructure.model.ProductEntity;
-import org.rus.product.infrastructure.repository.ProductJpaRepository;
-import org.rus.product.infrastructure.repository.ProductRepository;
+import org.rus.product.entity.model.ProductEntity;
+import org.rus.product.entity.repository.ProductJpaRepository;
+import org.rus.product.entity.repository.ProductRepository;
 import org.rus.product.mapper.ProductMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

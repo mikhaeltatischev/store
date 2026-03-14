@@ -11,7 +11,7 @@ import org.rus.product.domain.Product;
 import org.rus.product.dto.ProductResponse;
 import org.rus.product.dto.ProductSummaryResponse;
 import org.rus.product.enums.Status;
-import org.rus.product.infrastructure.model.ProductEntity;
+import org.rus.product.entity.model.ProductEntity;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;

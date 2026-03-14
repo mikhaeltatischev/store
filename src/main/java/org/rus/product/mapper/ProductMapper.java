@@ -4,7 +4,7 @@ import org.rus.product.domain.Money;
 import org.rus.product.domain.Product;
 import org.rus.product.dto.ProductResponse;
 import org.rus.product.dto.ProductSummaryResponse;
-import org.rus.product.infrastructure.model.ProductEntity;
+import org.rus.product.entity.model.ProductEntity;
 
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
