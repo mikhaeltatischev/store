@@ -45,4 +45,17 @@ public abstract class BaseProductControllerTest {
         return response.getId();
     }
 
+    protected UUID createFullTestProduct(CreateProductRequest request) throws Exception {
+        String responseJson = mockMvc.perform(post("/products")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(request)))
+                .andExpect(status().isCreated())
+                .andReturn()
+                .getResponse()
+                .getContentAsString();
+
+        ProductResponse response = objectMapper.readValue(responseJson, ProductResponse.class);
+        return response.getId();
+    }
+
 }
