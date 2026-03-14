@@ -24,8 +24,4 @@ public class PageRequest {
     @Builder.Default
     private int size = 20;
 
-    public int getOffset() {
-        return page * size;
-    }
-
 }
